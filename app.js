@@ -12,6 +12,13 @@ const app = express();
 const connectDB = require("./db/db");
 // const authenticateUser = require('./middleware/authentication');
 
+//  routers
+const authRouter = require('./routes/authRoutes');
+const userRouter = require('./routes/userRoutes');
+const productRouter = require('./routes/productRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
+const orderRouter = require('./routes/orderRoutes');
+
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -21,8 +28,17 @@ app.use(helmet());
 app.use(cors());
 app.use(xss());
 
+app.use(express.static('./public'));
+
+// app.use('/api/v1/auth', authRouter);
+// app.use('/api/v1/users', userRouter);
+// app.use('/api/v1/products', productRouter);
+// app.use('/api/v1/reviews', reviewRouter);
+// app.use('/api/v1/orders', orderRouter);
+
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
+
 
 const port = process.env.PORT || 5000;
 
