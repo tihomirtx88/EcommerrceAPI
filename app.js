@@ -10,6 +10,7 @@ const express = require("express");
 const app = express();
 
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./db/db");
 // const authenticateUser = require('./middleware/authentication');
@@ -27,6 +28,7 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 
 app.use(morgan('tiny'));
 app.use(express.json());
+app.use(cookieParser(process.env.JWT_SECRET));
 app.use(helmet());
 app.use(cors());
 app.use(xss());
