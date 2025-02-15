@@ -28,7 +28,24 @@ const updateUser = async (req, res) => {
 };
 
 const updateUserPassword = async (req, res) => {
-    res.send("ok");
+    const { oldPassword, newPassword} = req.body;
+
+    if (!oldPassword || !newPassword) {
+        throw new CustomError.BadRequestError(`Please provide both values`);
+    }
+
+    const user = await User.findOne({_id: req.user.userId}).select('+password');
+
+    const isPasswordCorect = await user.comparePasswords(oldPassword);
+    if (!isPasswordCorect) {
+        throw new CustomError.UnAuthorizedError(`Invlaid Credentials`);
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({msg: 'Success! Password Updated!'});
 };
 
 module.exports = {
