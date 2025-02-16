@@ -1,7 +1,7 @@
 const User = require('./../models/User');
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("./../errors");
-const { createTokenUser, atachCookieToResponse } = require("./../utils/index");
+const { createTokenUser, atachCookieToResponse, checkPermissions } = require("./../utils/index");
 
 const getAllUsers = async (req, res) => {
     const users = await User.find({role: 'user'}).select('-password');
@@ -14,6 +14,8 @@ const getSingleUser = async (req, res) => {
     if (!user) {
         throw new CustomError.UnauthenticatedError(`There is no user with id: ${req.params.id}`);
     }
+
+    checkPermissions(req.user, user._id);
 
     res.status(StatusCodes.OK).json({user});
 };
