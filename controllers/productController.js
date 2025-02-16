@@ -9,7 +9,8 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-    res.send("ok");
+    const porducts = await Product.find({});
+    res.status(StatusCodes.OK).json({porducts, count: porducts.length});
 };
 
 const getSingleProduct = async (req, res) => {
