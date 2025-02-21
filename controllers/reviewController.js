@@ -5,49 +5,59 @@ const CustomError = require("./../errors");
 const { checkPermissions } = require("./../utils/checkPermissions");
 
 const createReview = async (req, res) => {
-    const { product: productId} = req.body;
+  const { product: productId } = req.body;
 
-    const isValidProduct = await Product.findOne({_id: productId});
-    console.log(isValidProduct);
+  const isValidProduct = await Product.findOne({ _id: productId });
+  console.log(isValidProduct);
 
-    if (!isValidProduct) {
-        throw new CustomError.NotFoundError(`No product with id: ${productId}`);
-    }
+  if (!isValidProduct) {
+    throw new CustomError.NotFoundError(`No product with id: ${productId}`);
+  }
 
-    const isAlreadySubmitted = await Review.findOne({
-        product: productId,
-        user: req.user.userId
-    });
+  const isAlreadySubmitted = await Review.findOne({
+    product: productId,
+    user: req.user.userId,
+  });
 
-    if (isAlreadySubmitted) {
-        throw new CustomError.BadRequestError('Already submitted for this product');
-    }
+  if (isAlreadySubmitted) {
+    throw new CustomError.BadRequestError("Already submitted for this product");
+  }
 
-    req.body.user = req.user.userId;
-    const review = await Review.create(req.body);
-    res.status(StatusCodes.CREATED).json({review});
+  req.body.user = req.user.userId;
+  const review = await Review.create(req.body);
+  res.status(StatusCodes.CREATED).json({ review });
 };
 
 const getAllReviews = async (req, res) => {
-    res.send("ok");
+  const reviews = await Review.find({});
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length });
 };
 
 const getSingleReview = async (req, res) => {
-    res.send("ok");
+  const { id: reviewId } = req.params;
+  const review = await Review.findOne({ _id: reviewId });
+
+  if (!review) {
+    throw new CustomError.NotFoundError(
+      `There is no review with id: ${reviewId}`
+    );
+  }
+
+  res.status(StatusCodes.OK).json({ review });
 };
 
 const updateReview = async (req, res) => {
-    res.send("ok");
+  res.send("ok");
 };
 
 const deleteReview = async (req, res) => {
-    res.send("ok");
+  res.send("ok");
 };
 
 module.exports = {
-    createReview,
-    getAllReviews,
-    getSingleReview,
-    updateReview,
-    deleteReview
+  createReview,
+  getAllReviews,
+  getSingleReview,
+  updateReview,
+  deleteReview,
 };
