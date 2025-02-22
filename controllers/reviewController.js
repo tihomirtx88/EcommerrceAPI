@@ -8,7 +8,6 @@ const createReview = async (req, res) => {
   const { product: productId } = req.body;
 
   const isValidProduct = await Product.findOne({ _id: productId });
-  console.log(isValidProduct);
 
   if (!isValidProduct) {
     throw new CustomError.NotFoundError(`No product with id: ${productId}`);
