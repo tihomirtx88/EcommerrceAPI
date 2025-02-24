@@ -4,33 +4,34 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("./../errors");
 const { checkPermissions } = require("./../utils/checkPermissions");
 
-const fakeStripeAPI = async ({amount, currency}) => {
-  const clientScret = 'someRadnom';
-  return{clientScret, amount};
+const fakeStripeAPI = async ({ amount, currency }) => {
+  const clientScret = "someRadnom";
+  return { clientScret, amount };
 };
 
 const getAllOrders = async (req, res) => {
   const orders = await Order.find({});
-    res.status(StatusCodes.OK).json({ orders, count: orders.length });
+  res.status(StatusCodes.OK).json({ orders, count: orders.length });
 };
 
 const getSingleOrder = async (req, res) => {
   const { id: orderId } = req.params;
-    const order = await Order.findOne({ _id: orderId });
-  
-    if (!order) {
-      throw new CustomError.NotFoundError(
-        `There is no order with id: ${orderId}`
-      );
-    }
+  const order = await Order.findOne({ _id: orderId });
 
-    checkPermissions(req.user, order.user);
-  
-    res.status(StatusCodes.OK).json({ order });
+  if (!order) {
+    throw new CustomError.NotFoundError(
+      `There is no order with id: ${orderId}`
+    );
+  }
+
+  checkPermissions(req.user, order.user);
+
+  res.status(StatusCodes.OK).json({ order });
 };
 
 const getCurrentUserOrders = async (req, res) => {
-  res.send("ok");
+  const orders = await Order.find({ user: req.user.userId });
+  res.status(StatusCodes.OK).json({ orders, count: orders.length });
 };
 
 const createOrder = async (req, res) => {
@@ -71,21 +72,29 @@ const createOrder = async (req, res) => {
     //calculate subtotal
     subtotal += item.amount * price;
   }
-  
+
   //calculcate total
   const total = shippingFee + tax + subtotal;
 
   //get cleiant secret
   const paymentIntent = await fakeStripeAPI({
     amount: total,
-    currency: 'usd'
+    currency: "usd",
   });
 
   const order = await Order.create({
-    orderItems, total, subtotal, tax, shippingFee, clientSecret: paymentIntent.clientScret, user: req.user.userId
+    orderItems,
+    total,
+    subtotal,
+    tax,
+    shippingFee,
+    clientSecret: paymentIntent.clientScret,
+    user: req.user.userId,
   });
 
-  res.status(StatusCodes.CREATED).json({order, clientScret: order.clientScret});
+  res
+    .status(StatusCodes.CREATED)
+    .json({ order, clientScret: order.clientScret });
 };
 
 const updateOrder = async (req, res) => {
