@@ -10,7 +10,8 @@ const fakeStripeAPI = async ({amount, currency}) => {
 };
 
 const getAllOrders = async (req, res) => {
-  res.send("ok");
+  const orders = await Order.find({});
+    res.status(StatusCodes.OK).json({ orders, count: orders.length });
 };
 
 const getSingleOrder = async (req, res) => {
