@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("./../errors");
 const { atachCookieToResponse, createTokenUser } = require("./../utils/index");
 const crypto = require("crypto");
+const sendEmail = require("./../utils/sendEmail");
 
 const register = async (req, res) => {
     const { email, name, password } = req.body;
@@ -27,13 +28,20 @@ const register = async (req, res) => {
         role,
         verificationToken,
     });
+
+    await sendEmail({
+        to: email,
+        subject: "Verify Your Email",
+        text: `Your verification token is: ${verificationToken}`,
+        html: `<p>Your verification token is: <strong>${verificationToken}</strong></p>`,
+    });
     
     // const tokenUser = createTokenUser(user);
     // atachCookieToResponse({res, user:tokenUser});
     // res.status(StatusCodes.CREATED).json({user: tokenUser});
     
     // For testing purpuse
-    res.status(StatusCodes.CREATED).json({msg: 'Success! Plase check your email verified token', verificationToken});
+    res.status(StatusCodes.CREATED).json({msg: 'Success! Plase check your email verified token'});
 };
 
 const verifyEmail = async (req, res) => {
