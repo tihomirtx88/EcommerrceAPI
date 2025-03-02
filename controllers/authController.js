@@ -1,7 +1,7 @@
 const User = require("./../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("./../errors");
-const { atachCookieToResponse, createTokenUser } = require("./../utils/index");
+const { atachCookieToResponse, createTokenUser, sendVerificationEmail } = require("./../utils/index");
 const crypto = require("crypto");
 const sendEmail = require("./../utils/sendEmail");
 
