@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("./../errors");
 const { atachCookieToResponse, createTokenUser, sendVerificationEmail } = require("./../utils/index");
 const crypto = require("crypto");
-const sendEmail = require("./../utils/sendEmail");
+
 
 const register = async (req, res) => {
     const { email, name, password } = req.body;
@@ -29,12 +29,9 @@ const register = async (req, res) => {
         verificationToken,
     });
 
-    await sendEmail({
-        to: email,
-        subject: "Verify Your Email",
-        text: `Your verification token is: ${verificationToken}`,
-        html: `<p>Your verification token is: <strong>${verificationToken}</strong></p>`,
-    });
+    const origin = 'http://localhost:5000';
+
+    await sendVerificationEmail({email: user.email, name:user.name, verificationToken: user.verificationToken, origin});
     
     // const tokenUser = createTokenUser(user);
     // atachCookieToResponse({res, user:tokenUser});
