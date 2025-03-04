@@ -2,17 +2,24 @@ const CustomError = require("./../errors");
 const { isTokeValid } = require("./../utils/index");
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.signedCookies.token;
+  // const token = req.signedCookies.token;
 
-  if (!token) {
-    throw new CustomError.UnauthenticatedError("Authentication is not valid");
-  }
+  // if (!token) {
+  //   throw new CustomError.UnauthenticatedError("Authentication is not valid");
+  // }
 
   try {
-    const { name, userId, role } = isTokeValid({ token });
-    req.user = { name, role, userId };
+    // const { name, userId, role } = isTokeValid({ token });
+    // req.user = { name, role, userId };
+    // next();
 
-    next();
+    const { accessTokenJWT, refreshTokenJWT } = req.signedCookies;
+
+    if (accessTokenJWT) {
+      const payload = isTokeValid(accessTokenJWT);
+      req.user = payload.user;
+      return next();
+    }
   } catch (error) {
     throw new CustomError.UnauthenticatedError("Authentication is not valid");
   }

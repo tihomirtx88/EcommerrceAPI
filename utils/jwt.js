@@ -8,7 +8,7 @@ const createJWT = ({ payload }) => {
   return token;
 };
 
-const isTokeValid = ({ token }) => jwt.verify(token, process.env.JWT_SECRET);
+const isTokeValid = (token ) => jwt.verify(token, process.env.JWT_SECRET);
 
 const atachSingleCookieToResponse = ({ res, user }) => {
 
