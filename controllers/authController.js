@@ -83,7 +83,9 @@ const login = async (req, res) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
-    throw new CustomError.UnauthenticatedError("Invalid Credentials.There is not user with that email or password");
+    throw new CustomError.UnauthenticatedError(
+      "Invalid Credentials.There is not user with that email or password"
+    );
   }
 
   const isPasswordCorrect = await user.comparePasswords(password);
@@ -108,7 +110,9 @@ const login = async (req, res) => {
     const { isValid } = existingToken;
 
     if (!isValid) {
-      throw new CustomError.UnauthenticatedError("Invalid Credentials. The token are not valid");
+      throw new CustomError.UnauthenticatedError(
+        "Invalid Credentials. The token are not valid"
+      );
     }
 
     refreshToken = existingToken.refreshToken;
@@ -130,9 +134,17 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  res.cookie("token", "logout", {
+
+  await Token.findOneAndDelete({ user: req.user.userId });
+
+  res.cookie("accessToken", "logout", {
     httpOnly: true,
-    expires: new Date(Date.now() + 5 * 1000),
+    expires: new Date(Date.now()),
+  });
+
+  res.cookie("refreshToken", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
   });
 
   res.status(StatusCodes.OK).json({ msg: "user logout" });
