@@ -1,5 +1,6 @@
+const Token = require("../models/Token");
 const CustomError = require("./../errors");
-const { isTokeValid } = require("./../utils/index");
+const { isTokeValid, atachCookieToResponse } = require("./../utils/index");
 
 const authenticateUser = async (req, res, next) => {
   // const token = req.signedCookies.token;
@@ -8,18 +9,31 @@ const authenticateUser = async (req, res, next) => {
   //   throw new CustomError.UnauthenticatedError("Authentication is not valid");
   // }
 
+  const { accessToken, refreshToken } = req.signedCookies;
+
   try {
     // const { name, userId, role } = isTokeValid({ token });
     // req.user = { name, role, userId };
     // next();
 
-    const { accessTokenJWT, refreshTokenJWT } = req.signedCookies;
-
-    if (accessTokenJWT) {
-      const payload = isTokeValid(accessTokenJWT);
+    if (accessToken) {
+      const payload = isTokeValid(accessToken);
       req.user = payload.user;
       return next();
     }
+
+    const payload = isTokeValid(refreshToken);
+
+    const existingToken = await Token.findOne({user: payload.user.userId, refreshToken: payload.refreshToken});
+
+    if (!existingToken || !existingToken?.isValid) {
+      throw new CustomError.UnauthenticatedError("Authentication is not valid");
+    }
+    
+    atachCookieToResponse({res, user: payload.user, refreshToken: existingToken.refreshToken});
+    req.user = payload.user;
+    next();
+
   } catch (error) {
     throw new CustomError.UnauthenticatedError("Authentication is not valid");
   }

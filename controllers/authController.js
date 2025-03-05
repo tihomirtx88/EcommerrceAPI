@@ -83,7 +83,7 @@ const login = async (req, res) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
-    throw new CustomError.UnauthenticatedError("Invalid Credentials");
+    throw new CustomError.UnauthenticatedError("Invalid Credentials.There is not user with that email or password");
   }
 
   const isPasswordCorrect = await user.comparePasswords(password);
@@ -108,7 +108,7 @@ const login = async (req, res) => {
     const { isValid } = existingToken;
 
     if (!isValid) {
-      throw new CustomError.UnauthenticatedError("Invalid Credentials");
+      throw new CustomError.UnauthenticatedError("Invalid Credentials. The token are not valid");
     }
 
     refreshToken = existingToken.refreshToken;
