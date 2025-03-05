@@ -34,7 +34,14 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  verified: Date
+  verified: Date,
+  // Forrgot password functionality
+  passwordToken: {
+    type: String,
+  },
+  passwordTokenExpirationDate: {
+    type:Date
+  }
 });
 
 UserSchema.pre('save', async function(){
