@@ -3,6 +3,7 @@ const { createTokenUser } = require("./../utils/createTokeUser");
 const { checkPermissions } = require("./../utils/checkPermissions");
 const sendVerificationEmail = require("./sendVerificationEmail");
 const sendRessetPasswordEmail = require("./sendRessetPasswordEmail");
+const createHash = require("./createHash");
 
 module.exports = {
     isTokeValid, 
@@ -11,5 +12,6 @@ module.exports = {
     createTokenUser,
     checkPermissions,
     sendVerificationEmail,
-    sendRessetPasswordEmail
+    sendRessetPasswordEmail,
+    createHash
 };

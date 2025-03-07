@@ -9,6 +9,7 @@ const {
   sendRessetPasswordEmail
 } = require("./../utils/index");
 const crypto = require("crypto");
+const createHash = require("./../utils/createHash");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -170,7 +171,7 @@ const forgotPassword = async (req, res) => {
         const tenMinutes = 1000 * 60 * 10;
         const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
 
-        user.passwordToken = passwordToken;
+        user.passwordToken = createHash(passwordToken);
         user.passwordTokenExpirationDate = passwordTokenExpirationDate;
         await user.save();
     }
@@ -190,7 +191,7 @@ const resetPassword = async (req, res) => {
     if (user) {
         const currentDay = new Date();
 
-        if (user.passwordToken === currentDay && user.passwordTokenExpirationDate > currentDay) {
+        if (user.passwordToken === createHash(token) && user.passwordTokenExpirationDate > currentDay) {
             user.password = password;
             user.passwordToken = null;
             user.passwordTokenExpirationDate = null;
