@@ -4,21 +4,47 @@ const CustomError = require("./../errors");
 const path = require("path");
 
 const createProduct = async (req, res) => {
+  
+  if (req.files && req.files.image) {
+    const image = req.files.image;
+
+    const imageName = `${Date.now()}-${image.name}`;
+    const imagePath = path.join(__dirname, "../public/uploads/", imageName);
+
+    await image.mv(imagePath);
+
+    const imageUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/uploads/${imageName}`;
+
+    req.body.image = imageUrl; 
+  }
+
   req.body.user = req.user.userId;
-  const porduct = await Product.create(req.body);
-  res.status(StatusCodes.CREATED).json({ porduct });
+
+  const product = await Product.create(req.body);
+
+  res.status(StatusCodes.CREATED).json({ product });
 };
 
 const getAllProducts = async (req, res) => {
-  const porducts = await Product.find({});
-  res.status(StatusCodes.OK).json({ porducts, count: porducts.length });
+  try {
+    const porducts = await Product.find({});
+
+    // Send the products data back to the client
+    console.log(porducts);
+
+    res.status(StatusCodes.OK).json({ porducts, count: porducts.length });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching products", error });
+  }
 };
 
 const getSingleProduct = async (req, res) => {
   const { id: productId } = req.params;
   const product = await Product.findOne({ _id: productId }).populate({
-    path: 'reviews',
-    model: 'Review',
+    path: "reviews",
+    model: "Review",
   });
 
   if (!product) {
@@ -31,11 +57,15 @@ const getSingleProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-   const { id: productId } = req.params;
+  const { id: productId } = req.params;
 
-   const product = await Product.findByIdAndUpdate({ _id: productId }, req.body, {new: true, runValidators: true});
+  const product = await Product.findByIdAndUpdate(
+    { _id: productId },
+    req.body,
+    { new: true, runValidators: true }
+  );
 
-   if (!product) {
+  if (!product) {
     throw new CustomError.NotFoundError(
       `There is no product with id: ${productId}`
     );
@@ -56,38 +86,38 @@ const deleteProduct = async (req, res) => {
 
   await product.remove();
 
-  res.status(StatusCodes.OK).json({ msg: 'Product is success deleted' });
+  res.status(StatusCodes.OK).json({ msg: "Product is success deleted" });
 };
 
 const uploadImage = async (req, res) => {
   if (!req.files) {
-    throw new CustomError.BadRequestError(
-        'No File Uploaded'
-    );
+    throw new CustomError.BadRequestError("No File Uploaded");
   }
 
   const image = req.files.image;
 
-
-  if (!image.mimetype.startsWith('image')) {
-    throw new CustomError.BadRequestError('Please Upload Image');
+  if (!image.mimetype.startsWith("image")) {
+    throw new CustomError.BadRequestError("Please Upload Image");
   }
 
   const maxsize = 1024 * 1023;
 
   if (image.size > maxsize) {
     throw new CustomError.BadRequestError(
-        'Please upload image smaller then 1mb'
+      "Please upload image smaller then 1mb"
     );
   }
 
-  const imagePath = path.join(__dirname, '../public/uploads/' + `${image.name}`);
+  const imageName = `${Date.now()}-${image.name}`;
+
+  const imagePath = path.join(__dirname, "../public/uploads/", imageName);
 
   await image.mv(imagePath);
 
-  res.status(StatusCodes.OK).json({ image: `/uploads/${image.name}` });
+  // Create the absolute URL for the image
+  const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${imageName}`;
 
-
+  res.status(StatusCodes.OK).json({ image: imageUrl });
 };
 
 module.exports = {
