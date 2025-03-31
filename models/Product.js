@@ -61,6 +61,11 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    colors: {
+      type: [String],
+      default: ['#222'],
+      required: true,
+    },
     user: {
       type: mongoose.Types.ObjectId,
       ref: 'User',

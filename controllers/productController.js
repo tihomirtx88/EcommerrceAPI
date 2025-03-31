@@ -30,10 +30,6 @@ const createProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const porducts = await Product.find({});
-
-    // Send the products data back to the client
-    console.log(porducts);
-
     res.status(StatusCodes.OK).json({ porducts, count: porducts.length });
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
