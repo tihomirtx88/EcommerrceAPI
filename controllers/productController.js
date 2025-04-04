@@ -4,7 +4,6 @@ const CustomError = require("./../errors");
 const path = require("path");
 
 const createProduct = async (req, res) => {
-  
   if (req.files && req.files.image) {
     const image = req.files.image;
 
@@ -17,7 +16,7 @@ const createProduct = async (req, res) => {
       "host"
     )}/uploads/${imageName}`;
 
-    req.body.image = imageUrl; 
+    req.body.image = imageUrl;
   }
 
   req.body.user = req.user.userId;
@@ -29,8 +28,56 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const porducts = await Product.find({});
-    res.status(StatusCodes.OK).json({ porducts, count: porducts.length });
+    const { search, category, company, sort, price, freeShipping } = req.query;
+    const queryObject = {};
+
+    // Filter by search term (name)
+    if (search) {
+      queryObject.name = { $regex: search, $options: "i" };
+    }
+
+    // Filter by category
+    if (category && category !== "all") {
+      queryObject.category = category;
+    }
+
+    // Filter by company
+    if (company && company !== "all") {
+      queryObject.company = company;
+    }
+
+    // Filter by freeShipping
+    if (freeShipping === "true") {
+      queryObject.freeShipping = true;
+    }
+
+    // Filter by price
+    if (price) {
+      queryObject.price = { $lte: Number(price) }; 
+    }
+
+    let result = Product.find(queryObject);
+
+    switch (sort) {
+      case "a-z":
+        result = result.sort("name");
+        break;
+      case "z-a":
+        result = result.sort("-name");
+        break;
+      case "low":
+        result = result.sort("price");
+        break;
+      case "high":
+        result = result.sort("-price");
+        break;
+      default:
+        result = result.sort("name");
+        break;
+    }
+
+    const products = await result;
+    res.status(200).json({ products, count: products.length });
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
   }
