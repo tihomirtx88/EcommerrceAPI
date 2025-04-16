@@ -35,16 +35,21 @@ const getCurrentUserOrders = async (req, res) => {
 };
 
 const createOrder = async (req, res) => {
-  const { items: cartItems, tax, shippingFee } = req.body;
+  const { items: cartItems, tax, shippingFee, name, address } = req.body;
 
   if (!cartItems || cartItems.length < 1) {
+    console.log('No cart items provided');
     throw new CustomError.BadRequestError("No cart items provided!");
   }
 
   if (!tax || !shippingFee) {
-    throw new CustomError.BadRequestError(
-      "Please provide tax and Shipping Fee"
-    );
+    console.log('Please provide tax and shipping fee');
+    throw new CustomError.BadRequestError("Please provide tax and shipping fee");
+  }
+
+  if (!name || !address) {
+    console.log('Please provide shipping name and address');
+    throw new CustomError.BadRequestError("Please provide shipping name and address");
   }
 
   let orderItems = [];
@@ -83,6 +88,8 @@ const createOrder = async (req, res) => {
   });
 
   const order = await Order.create({
+    name,
+    address,
     orderItems,
     total,
     subtotal,

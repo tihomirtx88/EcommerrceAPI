@@ -41,7 +41,10 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.static('./public'));
 app.use(fileUpload());
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true,               // allow cookies to be sent
+}));
 app.use(xss());
 app.use(mongooseSanitize());
 

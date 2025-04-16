@@ -14,6 +14,14 @@ const SingleOrderItemSchema = mongoose.Schema({
 
 const OrderSchema = mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
     tax: {
       type: Number,
       required: true,

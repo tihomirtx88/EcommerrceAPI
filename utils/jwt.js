@@ -33,7 +33,7 @@ const atachCookieToResponse = ({ res, user, refreshToken }) => {
     httpOnly: true,
     secure: process.env.NODE_EMV === 'production',
     signed: true,
-    maxAge: 1000,
+    maxAge: 1000 * 60 * 15,
   });
 
   res.cookie("refreshToken", refreshTokenJWT, {
