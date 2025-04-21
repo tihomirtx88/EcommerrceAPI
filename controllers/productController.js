@@ -117,20 +117,39 @@ const getSingleProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
+
   const { id: productId } = req.params;
 
-  const product = await Product.findByIdAndUpdate(
-    { _id: productId },
-    req.body,
-    { new: true, runValidators: true }
-  );
+  const product = await Product.findById(productId);
 
   if (!product) {
-    throw new CustomError.NotFoundError(
-      `There is no product with id: ${productId}`
-    );
+    throw new CustomError.NotFoundError(`No product found with id: ${productId}`);
   }
 
+  const {
+    name,
+    price,
+    description,
+    category,
+    company,
+    colors,
+    featured,
+    freeShipping,
+    inventory
+  } = req.body;
+
+  if (name) product.name = name;
+  if (price !== undefined) product.price = Number(price);
+  if (description) product.description = description;
+  if (category) product.category = category;
+  if (company) product.company = company;
+  if (Array.isArray(colors)) product.colors = colors;
+  if (featured !== undefined) product.featured = Boolean(featured);
+  if (freeShipping !== undefined) product.freeShipping = Boolean(freeShipping);
+  if (inventory !== undefined) product.inventory = Number(inventory);
+
+  await product.save();
+  
   res.status(StatusCodes.OK).json({ product });
 };
 
