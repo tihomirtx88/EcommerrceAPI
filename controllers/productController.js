@@ -155,7 +155,7 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const { id: productId } = req.params;
-  const product = await Product.findOne({ _id: productId });
+  const product = await Product.findById(productId);
 
   if (!product) {
     throw new CustomError.NotFoundError(
@@ -163,7 +163,9 @@ const deleteProduct = async (req, res) => {
     );
   }
 
-  await product.remove();
+  await product.model('Review').deleteMany({ product: product._id });
+
+  await Product.findByIdAndDelete(productId);
 
   res.status(StatusCodes.OK).json({ msg: "Product is success deleted" });
 };
