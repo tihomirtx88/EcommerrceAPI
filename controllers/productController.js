@@ -19,6 +19,9 @@ const createProduct = async (req, res) => {
     req.body.image = imageUrl;
   }
 
+  console.log(req.body);
+  
+
   req.body.user = req.user.userId;
 
   const product = await Product.create(req.body);
