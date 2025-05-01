@@ -42,7 +42,23 @@ const getSingleReview = async (req, res) => {
     );
   }
 
+
   res.status(StatusCodes.OK).json({ review });
+};
+
+const getReviewsByProduct = async (req, res) => {
+  //Find product
+  const { productId } = req.params; 
+  //find review byt this user id
+  const reviews = await Review.find({ product: productId });
+
+  if (!reviews || reviews.length === 0) {
+    throw new CustomError.NotFoundError(
+      `There are no reviews for product with id: ${productId}`
+    );
+  }
+  
+  res.status(StatusCodes.OK).json({ reviews });
 };
 
 const updateReview = async (req, res) => {
@@ -95,5 +111,6 @@ module.exports = {
   getSingleReview,
   updateReview,
   deleteReview,
-  getsingleProductReveiws
+  getsingleProductReveiws,
+  getReviewsByProduct
 };

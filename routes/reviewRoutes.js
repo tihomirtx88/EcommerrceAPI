@@ -8,7 +8,12 @@ const {
   getSingleReview,
   updateReview,
   deleteReview,
+  getReviewsByProduct,
 } = require('../controllers/reviewController');
+
+
+// Route to get reviews for a specific product by productId
+router.route('/product/:productId').get(getReviewsByProduct);
 
 router.route('/').post(authenticateUser, createReview).get(getAllReviews);
 
